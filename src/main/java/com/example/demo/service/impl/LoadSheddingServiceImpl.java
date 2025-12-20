@@ -2,7 +2,10 @@ package com.example.demo.service.impl;
 
 import com.example.demo.entity.LoadSheddingEvent;
 import com.example.demo.entity.Zone;
-import com.example.demo.repository.*;
+import com.example.demo.repository.DemandReadingRepository;
+import com.example.demo.repository.LoadSheddingEventRepository;
+import com.example.demo.repository.SupplyForecastRepository;
+import com.example.demo.repository.ZoneRepository;
 import com.example.demo.service.LoadSheddingService;
 import org.springframework.stereotype.Service;
 
@@ -38,19 +41,19 @@ public class LoadSheddingServiceImpl implements LoadSheddingService {
                 zoneRepository.findByActiveTrueOrderByPriorityLevelAsc();
 
         if (zones.isEmpty()) {
-            throw new RuntimeException("No suitable");
+            throw new RuntimeException("No suitable zones");
         }
 
+        // Lowest priority zone is shed first
         Zone target = zones.get(zones.size() - 1);
 
-        var event = LoadSheddingEvent event = LoadSheddingEvent.builder()
-        .zone(target)
-        .eventStart(Instant.now())
-        .reason("Overload")
-        .forecastId(forecast.getId())
-        .expectedDemandReductionMW(50.0)
-        .build();
-
+        LoadSheddingEvent event = LoadSheddingEvent.builder()
+                .zone(target)
+                .supplyForecast(forecast)   // ✅ CORRECT
+                .eventStart(Instant.now())
+                .reason("Overload")
+                .expectedDemandReductionMW(50.0)
+                .build();
 
         return eventRepository.save(event);
     }
