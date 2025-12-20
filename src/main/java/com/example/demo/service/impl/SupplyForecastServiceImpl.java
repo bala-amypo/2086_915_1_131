@@ -1,60 +1,58 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.entity.SupplyForecast;
+import com.example.demo.exception.BadRequestException;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.SupplyForecastRepository;
 import com.example.demo.service.SupplyForecastService;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public class SupplyForecastServiceImpl implements SupplyForecastService {
 
-    private final SupplyForecastRepository forecastRepository;
+    private final SupplyForecastRepository supplyForecastRepository;
 
-    public SupplyForecastServiceImpl(
-            SupplyForecastRepository forecastRepository) {
-        this.forecastRepository = forecastRepository;
+    public SupplyForecastServiceImpl(SupplyForecastRepository supplyForecastRepository) {
+        this.supplyForecastRepository = supplyForecastRepository;
     }
 
     @Override
     public SupplyForecast createForecast(SupplyForecast forecast) {
-
         if (forecast.getAvailableSupplyMW() < 0) {
-            throw new RuntimeException(">= 0");
+            throw new BadRequestException("availableSupplyMW must be >= 0");
         }
-
-        if (forecast.getForecastStart()
-                .isAfter(forecast.getForecastEnd())) {
-            throw new RuntimeException("range");
+        if (forecast.getForecastStart().isAfter(forecast.getForecastEnd())) {
+            throw new BadRequestException("invalid range");
         }
-
-        return forecastRepository.save(forecast);
+        return supplyForecastRepository.save(forecast);
     }
 
     @Override
     public SupplyForecast updateForecast(Long id, SupplyForecast forecast) {
-        SupplyForecast existing = getForecastById(id);
+        SupplyForecast existing = supplyForecastRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Forecast not found"));
+
         existing.setAvailableSupplyMW(forecast.getAvailableSupplyMW());
         existing.setForecastStart(forecast.getForecastStart());
         existing.setForecastEnd(forecast.getForecastEnd());
-        return forecastRepository.save(existing);
+
+        return supplyForecastRepository.save(existing);
     }
 
     @Override
     public SupplyForecast getForecastById(Long id) {
-        return forecastRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Forecast not found"));
+        return supplyForecastRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Forecast not found"));
     }
 
     @Override
     public SupplyForecast getLatestForecast() {
-        return forecastRepository.findFirstByOrderByGeneratedAtDesc()
-                .orElseThrow(() -> new RuntimeException("No forecasts"));
+        return supplyForecastRepository.findFirstByOrderByGeneratedAtDesc()
+                .orElseThrow(() -> new ResourceNotFoundException("No forecasts"));
     }
 
     @Override
     public List<SupplyForecast> getAllForecasts() {
-        return forecastRepository.findAll();
+        return supplyForecastRepository.findAll();
     }
 }
