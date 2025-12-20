@@ -7,27 +7,28 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service // Make sure this is present
+@Service
 public class SupplyForecastServiceImpl implements SupplyForecastService {
 
-    private final SupplyForecastRepository repository;
+    private final SupplyForecastRepository forecastRepository;
 
-    public SupplyForecastServiceImpl(SupplyForecastRepository repository) {
-        this.repository = repository;
+    public SupplyForecastServiceImpl(SupplyForecastRepository forecastRepository) {
+        this.forecastRepository = forecastRepository;
     }
 
     @Override
     public SupplyForecast createForecast(SupplyForecast forecast) {
-        return repository.save(forecast);
+        return forecastRepository.save(forecast);
     }
 
     @Override
     public List<SupplyForecast> getForecastsForZone(Long zoneId) {
-        return repository.findByZoneIdOrderByForecastTimeDesc(zoneId);
+        return forecastRepository.findByZoneIdOrderByForecastTimeDesc(zoneId);
     }
 
     @Override
     public SupplyForecast getLatestForecast(Long zoneId) {
-        return repository.findFirstByZoneIdOrderByForecastTimeDesc(zoneId);
+        return forecastRepository.findFirstByZoneIdOrderByForecastTimeDesc(zoneId)
+                .orElse(null);
     }
 }
