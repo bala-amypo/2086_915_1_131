@@ -3,35 +3,37 @@ package com.example.demo.controller;
 import com.example.demo.entity.DemandReading;
 import com.example.demo.service.DemandReadingService;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/demand")
+@RequestMapping("/api/demand-readings")
 public class DemandReadingController {
 
-    private final DemandReadingService service;
+    private final DemandReadingService demandReadingService;
 
-    public DemandReadingController(DemandReadingService service) {
-        this.service = service;
-    }
-
-    @GetMapping
-    public List<DemandReading> getAll() {
-        return service.getAllDemandReadings();
-    }
-
-    @GetMapping("/{id}")
-    public DemandReading getById(@PathVariable Long id) {
-        return service.getDemandReadingById(id);
+    public DemandReadingController(DemandReadingService demandReadingService) {
+        this.demandReadingService = demandReadingService;
     }
 
     @PostMapping
-    public DemandReading create(@RequestBody DemandReading demandReading) {
-        return service.createDemandReading(demandReading);
+    public DemandReading create(@RequestBody DemandReading reading) {
+        return demandReadingService.createReading(reading);
     }
 
-    @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        service.deleteDemandReading(id);
+    @GetMapping("/zone/{zoneId}")
+    public List<DemandReading> getByZone(@PathVariable Long zoneId) {
+        return demandReadingService.getReadingsForZone(zoneId);
+    }
+
+    @GetMapping("/zone/{zoneId}/latest")
+    public DemandReading getLatest(@PathVariable Long zoneId) {
+        return demandReadingService.getLatestReading(zoneId);
+    }
+
+    @GetMapping("/zone/{zoneId}/recent")
+    public List<DemandReading> getRecent(@PathVariable Long zoneId,
+                                         @RequestParam int limit) {
+        return demandReadingService.getRecentReadings(zoneId, limit);
     }
 }
