@@ -10,5 +10,5 @@ public interface SupplyForecastRepository extends JpaRepository<SupplyForecast, 
     List<SupplyForecast> findByZoneIdOrderByForecastTimeDesc(Long zoneId);
 
     Optional<SupplyForecast> findFirstByZoneIdOrderByForecastTimeDesc(Long zoneId);
+
 }
-`
