@@ -10,41 +10,43 @@ public class SupplyForecast {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Double availableSupplyMW;
+    private Long zoneId;
 
-    private Instant forecastStart;
-    private Instant forecastEnd;
+    private Instant forecastTime;
 
-    private Instant generatedAt;
+    private double supplyValue;
 
-    public SupplyForecast() {}
+    // getters and setters
 
-    public SupplyForecast(Long id, Double availableSupplyMW,
-                          Instant forecastStart, Instant forecastEnd, Instant generatedAt) {
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
         this.id = id;
-        this.availableSupplyMW = availableSupplyMW;
-        this.forecastStart = forecastStart;
-        this.forecastEnd = forecastEnd;
-        this.generatedAt = generatedAt;
     }
 
-    @PrePersist
-    public void onCreate() {
-        this.generatedAt = Instant.now();
+    public Long getZoneId() {
+        return zoneId;
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public void setZoneId(Long zoneId) {
+        this.zoneId = zoneId;
+    }
 
-    public Double getAvailableSupplyMW() { return availableSupplyMW; }
-    public void setAvailableSupplyMW(Double availableSupplyMW) { this.availableSupplyMW = availableSupplyMW; }
+    public Instant getForecastTime() {
+        return forecastTime;
+    }
 
-    public Instant getForecastStart() { return forecastStart; }
-    public void setForecastStart(Instant forecastStart) { this.forecastStart = forecastStart; }
+    public void setForecastTime(Instant forecastTime) {
+        this.forecastTime = forecastTime;
+    }
 
-    public Instant getForecastEnd() { return forecastEnd; }
-    public void setForecastEnd(Instant forecastEnd) { this.forecastEnd = forecastEnd; }
+    public double getSupplyValue() {
+        return supplyValue;
+    }
 
-    public Instant getGeneratedAt() { return generatedAt; }
-    public void setGeneratedAt(Instant generatedAt) { this.generatedAt = generatedAt; }
+    public void setSupplyValue(double supplyValue) {
+        this.supplyValue = supplyValue;
+    }
 }
