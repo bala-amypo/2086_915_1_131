@@ -2,14 +2,13 @@ package com.example.demo.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.Instant;
 
 @Entity
-@Data
-@Builder
+@Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Zone {
 
     @Id
@@ -19,9 +18,7 @@ public class Zone {
     @Column(unique = true, nullable = false)
     private String zoneName;
 
-    @Column(nullable = false)
     private Integer priorityLevel;
-
     private Integer population;
 
     @Builder.Default
