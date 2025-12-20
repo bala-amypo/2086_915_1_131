@@ -43,13 +43,14 @@ public class LoadSheddingServiceImpl implements LoadSheddingService {
 
         Zone target = zones.get(zones.size() - 1);
 
-        var event = LoadSheddingEvent.builder()
-                .zone(target)
-                .eventStart(Instant.now())
-                .reason("Overload")
-                .triggeredByForecastId(forecast.getId())
-                .expectedDemandReductionMW(50.0)
-                .build();
+        var event = LoadSheddingEvent event = LoadSheddingEvent.builder()
+        .zone(target)
+        .eventStart(Instant.now())
+        .reason("Overload")
+        .forecastId(forecast.getId())
+        .expectedDemandReductionMW(50.0)
+        .build();
+
 
         return eventRepository.save(event);
     }
