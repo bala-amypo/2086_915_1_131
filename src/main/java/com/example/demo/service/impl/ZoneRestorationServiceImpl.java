@@ -5,10 +5,14 @@ import com.example.demo.entity.LoadSheddingEvent;
 import com.example.demo.entity.ZoneRestorationRecord;
 import com.example.demo.exception.BadRequestException;
 import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.repository.*;
+import com.example.demo.repository.LoadSheddingEventRepository;
+import com.example.demo.repository.ZoneRepository;
+import com.example.demo.repository.ZoneRestorationRecordRepository;
 import com.example.demo.service.ZoneRestorationService;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
 
 @Service
@@ -28,15 +32,18 @@ public class ZoneRestorationServiceImpl implements ZoneRestorationService {
 
     @Override
     public ZoneRestorationRecord restoreZone(ZoneRestorationRecord record) {
+        // Fetch event and zone
         LoadSheddingEvent event = eventRepository.findById(record.getEventId())
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
 
         Zone zone = zoneRepository.findById(record.getZone().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
 
-        // Changed from getEventStart() to getEventTime()
-        if (!record.getRestoredAt().isAfter(event.getEventTime())) {
-            throw new BadRequestException("Restoration time must be after event time");
+        // Convert event's LocalDateTime to Instant for comparison
+        Instant eventInstant = event.getEventTime().atZone(ZoneId.systemDefault()).toInstant();
+
+        if (!record.getRestoredAt().isAfter(eventInstant)) {
+            throw new BadRequestException("Restoration time must be after event start time");
         }
 
         record.setZone(zone);
