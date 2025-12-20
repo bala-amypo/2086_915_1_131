@@ -1,5 +1,7 @@
 package com.example.demo.controller;
 
+import com.example.demo.dto.AuthRequest;
+import com.example.demo.dto.AuthResponse;
 import com.example.demo.entity.AppUser;
 import com.example.demo.service.AppUserService;
 import org.springframework.web.bind.annotation.*;
@@ -15,10 +17,19 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public AppUser register(
-            @RequestParam String email,
-            @RequestParam String password,
-            @RequestParam String role) {
-        return appUserService.register(email, password, role);
+    public AppUser register(@RequestBody AuthRequest request) {
+        return appUserService.register(
+                request.getEmail(),
+                request.getPassword(),
+                "ROLE_USER"
+        );
+    }
+
+    @PostMapping("/login")
+    public AuthResponse login(@RequestBody AuthRequest request) {
+        return appUserService.login(
+                request.getEmail(),
+                request.getPassword()
+        );
     }
 }

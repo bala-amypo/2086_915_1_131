@@ -17,29 +17,28 @@ public class SupplyForecastController {
     }
 
     @PostMapping
-    public SupplyForecast createForecast(@RequestBody SupplyForecast forecast) {
+    public SupplyForecast create(@RequestBody SupplyForecast forecast) {
         return supplyForecastService.createForecast(forecast);
     }
 
     @PutMapping("/{id}")
-    public SupplyForecast updateForecast(
-            @PathVariable Long id,
-            @RequestBody SupplyForecast forecast) {
+    public SupplyForecast update(@PathVariable Long id,
+                                 @RequestBody SupplyForecast forecast) {
         return supplyForecastService.updateForecast(id, forecast);
     }
 
     @GetMapping("/{id}")
-    public SupplyForecast getForecast(@PathVariable Long id) {
+    public SupplyForecast getById(@PathVariable Long id) {
         return supplyForecastService.getForecastById(id);
     }
 
     @GetMapping("/latest")
-    public SupplyForecast getLatestForecast() {
+    public SupplyForecast getLatest() {
         return supplyForecastService.getLatestForecast();
     }
 
     @GetMapping
-    public List<SupplyForecast> getAllForecasts() {
+    public List<SupplyForecast> getAll() {
         return supplyForecastService.getAllForecasts();
     }
 }
