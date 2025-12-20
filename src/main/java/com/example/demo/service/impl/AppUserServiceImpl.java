@@ -1,40 +1,69 @@
 package com.example.demo.service.impl;
 
+import com.example.demo.dto.AuthResponse;
 import com.example.demo.entity.AppUser;
 import com.example.demo.exception.BadRequestException;
-import com.example.demo.exception.ResourceNotFoundException;
+import com.example.demo.exception.UnauthorizedException;
 import com.example.demo.repository.AppUserRepository;
+import com.example.demo.security.JwtTokenProvider;
 import com.example.demo.service.AppUserService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
 
+@Service
 public class AppUserServiceImpl implements AppUserService {
 
     private final AppUserRepository repo;
-    private final PasswordEncoder passwordEncoder;
+    private final PasswordEncoder encoder;
+    private final JwtTokenProvider jwtProvider;
 
-    public AppUserServiceImpl(AppUserRepository repo, PasswordEncoder passwordEncoder) {
+    public AppUserServiceImpl(
+            AppUserRepository repo,
+            PasswordEncoder encoder,
+            JwtTokenProvider jwtProvider
+    ) {
         this.repo = repo;
-        this.passwordEncoder = passwordEncoder;
+        this.encoder = encoder;
+        this.jwtProvider = jwtProvider;
     }
 
     @Override
-    public AppUser register(AppUser user) {
+    public void register(String email, String password, String role) {
 
-        repo.findByEmail(user.getEmail()).ifPresent(u -> {
-            throw new BadRequestException("unique");
-        });
+        if (repo.findByEmail(email).isPresent()) {
+            throw new BadRequestException("User already exists");
+        }
 
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        AppUser user = AppUser.builder()
+                .email(email)
+                .password(encoder.encode(password))
+                .role(role)
+                .build();
 
-        if (user.getActive() == null)
-            user.setActive(true);
-
-        return repo.save(user);
+        repo.save(user);
     }
 
     @Override
-    public AppUser getByEmail(String email) {
-        return repo.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    public AuthResponse login(String email, String password) {
+
+        AppUser user = repo.findByEmail(email)
+                .orElseThrow(() -> new UnauthorizedException("Invalid credentials"));
+
+        if (!encoder.matches(password, user.getPassword())) {
+            throw new UnauthorizedException("Invalid credentials");
+        }
+
+        String token = jwtProvider.generateToken(
+                user.getId(),
+                user.getEmail(),
+                user.getRole()
+        );
+
+        return AuthResponse.builder()
+                .token(token)
+                .userId(user.getId())
+                .email(user.getEmail())
+                .role(user.getRole())
+                .build();
     }
 }

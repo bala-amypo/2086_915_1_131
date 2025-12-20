@@ -1,31 +1,33 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.entity.*;
-import com.example.demo.exception.BadRequestException;
+import com.example.demo.entity.LoadSheddingEvent;
+import com.example.demo.entity.SupplyForecast;
+import com.example.demo.entity.Zone;
 import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.repository.*;
+import com.example.demo.repository.LoadSheddingEventRepository;
+import com.example.demo.repository.SupplyForecastRepository;
+import com.example.demo.repository.ZoneRepository;
 import com.example.demo.service.LoadSheddingService;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
 
+@Service
 public class LoadSheddingServiceImpl implements LoadSheddingService {
 
+    private final LoadSheddingEventRepository repo;
     private final SupplyForecastRepository forecastRepo;
     private final ZoneRepository zoneRepo;
-    private final DemandReadingRepository readingRepo;
-    private final LoadSheddingEventRepository eventRepo;
 
     public LoadSheddingServiceImpl(
+            LoadSheddingEventRepository repo,
             SupplyForecastRepository forecastRepo,
-            ZoneRepository zoneRepo,
-            DemandReadingRepository readingRepo,
-            LoadSheddingEventRepository eventRepo
+            ZoneRepository zoneRepo
     ) {
+        this.repo = repo;
         this.forecastRepo = forecastRepo;
         this.zoneRepo = zoneRepo;
-        this.readingRepo = readingRepo;
-        this.eventRepo = eventRepo;
     }
 
     @Override
@@ -34,52 +36,35 @@ public class LoadSheddingServiceImpl implements LoadSheddingService {
         SupplyForecast forecast = forecastRepo.findById(forecastId)
                 .orElseThrow(() -> new ResourceNotFoundException("Forecast not found"));
 
-        List<Zone> zones = zoneRepo.findByActiveTrueOrderByPriorityLevelAsc();
+        Zone zone = zoneRepo.findAll().stream()
+                .findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
 
-        if (zones.isEmpty())
-            throw new BadRequestException("No overload");
-
-        double totalDemand = 0;
-        for (Zone z : zones) {
-            DemandReading r = readingRepo
-                    .findFirstByZoneIdOrderByRecordedAtDesc(z.getId())
-                    .orElse(null);
-            if (r != null)
-                totalDemand += r.getDemandMW();
-        }
-
-        if (totalDemand <= forecast.getAvailableSupplyMW())
-            throw new BadRequestException("No overload");
-
-        Zone cut = zones.get(zones.size() - 1);
-
-        DemandReading r = readingRepo
-                .findFirstByZoneIdOrderByRecordedAtDesc(cut.getId())
-                .orElseThrow(() -> new BadRequestException("No suitable"));
-
-        LoadSheddingEvent ev = LoadSheddingEvent.builder()
-                .zone(cut)
+        LoadSheddingEvent event = LoadSheddingEvent.builder()
+                .zone(zone)
                 .eventStart(Instant.now())
-                .expectedDemandReductionMW(r.getDemandMW())
-                .reason("AUTO")
+                .reason("AUTO_LOAD_SHEDDING")
+                .triggeredByForecastId(forecast.getId())
                 .build();
 
-        return eventRepo.save(ev);
-    }
-
-    @Override
-    public List<LoadSheddingEvent> getAllEvents() {
-        return eventRepo.findAll();
+        return repo.save(event);
     }
 
     @Override
     public LoadSheddingEvent getEventById(Long id) {
-        return eventRepo.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
+        return repo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Load shedding event not found"));
     }
 
     @Override
     public List<LoadSheddingEvent> getEventsForZone(Long zoneId) {
-        return eventRepo.findByZoneIdOrderByEventStartDesc(zoneId);
+        Zone zone = zoneRepo.findById(zoneId)
+                .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
+        return repo.findByZone(zone);
+    }
+
+    @Override
+    public List<LoadSheddingEvent> getAllEvents() {
+        return repo.findAll();
     }
 }
