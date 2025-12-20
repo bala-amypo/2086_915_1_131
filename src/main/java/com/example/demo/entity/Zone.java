@@ -1,40 +1,74 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Getter @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = "zoneName"))
 public class Zone {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false, unique = true)
     private String zoneName;
 
+    @Column(nullable = false)
     private Integer priorityLevel;
+
     private Integer population;
 
-    @Builder.Default
-    private Boolean active = true;
+    private Boolean active;
 
     private Instant createdAt;
     private Instant updatedAt;
 
+    public Zone() {
+        this.active = true;
+    }
+
+    public Zone(Long id, String zoneName, Integer priorityLevel, Integer population,
+                Boolean active, Instant createdAt, Instant updatedAt) {
+        this.id = id;
+        this.zoneName = zoneName;
+        this.priorityLevel = priorityLevel;
+        this.population = population;
+        this.active = active;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
     @PrePersist
-    void onCreate() {
-        createdAt = Instant.now();
-        updatedAt = Instant.now();
+    public void onCreate() {
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
+        if (this.active == null) this.active = true;
     }
 
     @PreUpdate
-    void onUpdate() {
-        updatedAt = Instant.now();
+    public void onUpdate() {
+        this.updatedAt = Instant.now();
     }
+
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getZoneName() { return zoneName; }
+    public void setZoneName(String zoneName) { this.zoneName = zoneName; }
+
+    public Integer getPriorityLevel() { return priorityLevel; }
+    public void setPriorityLevel(Integer priorityLevel) { this.priorityLevel = priorityLevel; }
+
+    public Integer getPopulation() { return population; }
+    public void setPopulation(Integer population) { this.population = population; }
+
+    public Boolean getActive() { return active; }
+    public void setActive(Boolean active) { this.active = active; }
+
+    public Instant getCreatedAt() { return createdAt; }
+    public void setCreatedAt(Instant createdAt) { this.createdAt = createdAt; }
+
+    public Instant getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(Instant updatedAt) { this.updatedAt = updatedAt; }
 }
