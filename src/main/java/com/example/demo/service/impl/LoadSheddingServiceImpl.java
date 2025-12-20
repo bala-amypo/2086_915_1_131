@@ -2,6 +2,8 @@ package com.example.demo.service.impl;
 
 import com.example.demo.entity.LoadSheddingEvent;
 import com.example.demo.entity.Zone;
+import com.example.demo.exception.BadRequestException;
+import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.DemandReadingRepository;
 import com.example.demo.repository.LoadSheddingEventRepository;
 import com.example.demo.repository.SupplyForecastRepository;
@@ -34,24 +36,28 @@ public class LoadSheddingServiceImpl implements LoadSheddingService {
     @Override
     public LoadSheddingEvent triggerLoadShedding(Long forecastId) {
 
-        var forecast = forecastRepository.findById(forecastId)
-                .orElseThrow(() -> new RuntimeException("Forecast not found"));
+        // 1. Forecast must exist
+        forecastRepository.findById(forecastId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Forecast not found"));
 
+        // 2. Get active zones ordered by priority
         List<Zone> zones =
                 zoneRepository.findByActiveTrueOrderByPriorityLevelAsc();
 
         if (zones.isEmpty()) {
-            throw new RuntimeException("No suitable zones");
+            throw new BadRequestException("No suitable zones");
         }
 
-        // Lowest priority zone is shed first
-        Zone target = zones.get(zones.size() - 1);
+        // 3. Pick lowest priority zone (last in sorted list)
+        Zone targetZone = zones.get(zones.size() - 1);
 
+        // 4. Create load shedding event
         LoadSheddingEvent event = LoadSheddingEvent.builder()
-                .zone(target)
-                .supplyForecast(forecast)   // ✅ CORRECT
+                .zone(targetZone)
                 .eventStart(Instant.now())
                 .reason("Overload")
+                .triggeredByForecastId(forecastId)   // ✅ CORRECT FIELD
                 .expectedDemandReductionMW(50.0)
                 .build();
 
@@ -61,7 +67,8 @@ public class LoadSheddingServiceImpl implements LoadSheddingService {
     @Override
     public LoadSheddingEvent getEventById(Long id) {
         return eventRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Event not found"));
     }
 
     @Override
