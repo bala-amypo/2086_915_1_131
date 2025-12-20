@@ -27,7 +27,7 @@ public class ZoneServiceImpl implements ZoneService {
         if (zone.getZoneName() == null || zone.getZoneName().isEmpty()) {
             throw new BadRequestException("Zone name cannot be empty");
         }
-
+        
         // Save the zone
         return repo.save(zone);
     }
