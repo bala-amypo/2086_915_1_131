@@ -2,7 +2,8 @@ package com.example.demo.service;
 
 import com.example.demo.entity.DemandReading;
 import java.util.List;
-
+import org.springframework.stereotype.Service;
+@Service
 public interface DemandReadingService {
 
     DemandReading createReading(DemandReading reading);
