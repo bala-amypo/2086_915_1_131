@@ -1,10 +1,9 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Entity
-@Table(name = "load_shedding_events")
 public class LoadSheddingEvent {
 
     @Id
@@ -13,50 +12,18 @@ public class LoadSheddingEvent {
 
     private Long zoneId;
 
-    private String description;
+    private Instant startTime;   // ⚠️ DIFFERENT NAME
 
-    private LocalDateTime eventTime = LocalDateTime.now();
+    private Instant endTime;
 
-    // Constructors
-    public LoadSheddingEvent() {
+    private Boolean active;
+
+    // getters & setters
+    public Instant getStartTime() {
+        return startTime;
     }
 
-    public LoadSheddingEvent(Long zoneId, String description) {
-        this.zoneId = zoneId;
-        this.description = description;
-        this.eventTime = LocalDateTime.now();
-    }
-
-    // Getters and Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getZoneId() {
-        return zoneId;
-    }
-
-    public void setZoneId(Long zoneId) {
-        this.zoneId = zoneId;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public LocalDateTime getEventTime() {
-        return eventTime;
-    }
-
-    public void setEventTime(LocalDateTime eventTime) {
-        this.eventTime = eventTime;
+    public void setStartTime(Instant startTime) {
+        this.startTime = startTime;
     }
 }
