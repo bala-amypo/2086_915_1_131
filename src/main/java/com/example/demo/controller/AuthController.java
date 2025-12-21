@@ -1,35 +1,30 @@
-// package com.example.demo.controller;
+package com.example.demo.controller;
 
-// import com.example.demo.dto.AuthRequest;
-// import com.example.demo.dto.AuthResponse;
-// import com.example.demo.entity.AppUser;
-// import com.example.demo.service.AppUserService;
-// import org.springframework.web.bind.annotation.*;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
-// @RestController
-// @RequestMapping("/auth")
-// public class AuthController {
+@RestController
+@RequestMapping("/auth")
+public class AuthController {
 
-//     private final AppUserService appUserService;
+    private final AuthenticationManager authenticationManager;
 
-//     public AuthController(AppUserService appUserService) {
-//         this.appUserService = appUserService;
-//     }
+    public AuthController(AuthenticationManager authenticationManager) {
+        this.authenticationManager = authenticationManager;
+    }
 
-//     @PostMapping("/register")
-//     public AppUser register(@RequestBody AuthRequest request) {
-//         return appUserService.register(
-//                 request.getEmail(),
-//                 request.getPassword(),
-//                 "ROLE_USER"
-//         );
-//     }
+    @PostMapping("/login")
+    public String login(@RequestBody LoginRequest request) {
 
-//     @PostMapping("/login")
-//     public AuthResponse login(@RequestBody AuthRequest request) {
-//         return appUserService.login(
-//                 request.getEmail(),
-//                 request.getPassword()
-//         );
-//     }
-// }
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getUsername(),
+                        request.getPassword()
+                )
+        );
+
+        return "Login successful";
+    }
+}
