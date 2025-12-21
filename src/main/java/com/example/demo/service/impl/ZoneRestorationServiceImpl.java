@@ -22,9 +22,11 @@ public class ZoneRestorationServiceImpl implements ZoneRestorationService {
     private final LoadSheddingEventRepository eventRepository;
     private final ZoneRepository zoneRepository;
 
-    public ZoneRestorationServiceImpl(ZoneRestorationRecordRepository restorationRepository,
-                                      LoadSheddingEventRepository eventRepository,
-                                      ZoneRepository zoneRepository) {
+    public ZoneRestorationServiceImpl(
+            ZoneRestorationRecordRepository restorationRepository,
+            LoadSheddingEventRepository eventRepository,
+            ZoneRepository zoneRepository) {
+
         this.restorationRepository = restorationRepository;
         this.eventRepository = eventRepository;
         this.zoneRepository = zoneRepository;
@@ -32,15 +34,19 @@ public class ZoneRestorationServiceImpl implements ZoneRestorationService {
 
     @Override
     public ZoneRestorationRecord restoreZone(ZoneRestorationRecord record) {
-        // Fetch event and zone
+
+        // Fetch event
         LoadSheddingEvent event = eventRepository.findById(record.getEventId())
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
 
+        // Fetch zone
         Zone zone = zoneRepository.findById(record.getZone().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
 
-        // Convert event's LocalDateTime to Instant for comparison
-        Instant eventInstant = event.getEventTime().atZone(ZoneId.systemDefault()).toInstant();
+        // ✅ FIX: use eventStart (NOT eventTime)
+        Instant eventInstant = event.getEventStart()
+                .atZone(ZoneId.systemDefault())
+                .toInstant();
 
         if (!record.getRestoredAt().isAfter(eventInstant)) {
             throw new BadRequestException("Restoration time must be after event start time");
@@ -49,15 +55,3 @@ public class ZoneRestorationServiceImpl implements ZoneRestorationService {
         record.setZone(zone);
         return restorationRepository.save(record);
     }
-
-    @Override
-    public ZoneRestorationRecord getRecordById(Long id) {
-        return restorationRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Record not found"));
-    }
-
-    @Override
-    public List<ZoneRestorationRecord> getRecordsForZone(Long zoneId) {
-        return restorationRepository.findByZoneIdOrderByRestoredAtDesc(zoneId);
-    }
-}
