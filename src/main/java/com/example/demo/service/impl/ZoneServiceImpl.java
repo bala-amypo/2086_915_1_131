@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service   // ⭐ THIS LINE FIXES THE BEAN PROBLEM
+@Service
 public class ZoneServiceImpl implements ZoneService {
 
     private final ZoneRepository zoneRepository;
@@ -22,6 +22,16 @@ public class ZoneServiceImpl implements ZoneService {
     }
 
     @Override
+    public Zone updateZone(Long id, Zone zone) {
+        Zone existing = getZoneById(id);
+        existing.setZoneName(zone.getZoneName());
+        existing.setPriorityLevel(zone.getPriorityLevel());
+        existing.setPopulation(zone.getPopulation());
+        existing.setActive(zone.getActive());
+        return zoneRepository.save(existing);
+    }
+
+    @Override
     public Zone getZoneById(Long id) {
         return zoneRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Zone not found"));
@@ -30,5 +40,12 @@ public class ZoneServiceImpl implements ZoneService {
     @Override
     public List<Zone> getAllZones() {
         return zoneRepository.findAll();
+    }
+
+    @Override
+    public void deactivateZone(Long id) {
+        Zone zone = getZoneById(id);
+        zone.setActive(false);
+        zoneRepository.save(zone);
     }
 }
