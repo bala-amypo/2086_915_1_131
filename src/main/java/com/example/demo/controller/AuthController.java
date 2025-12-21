@@ -1,31 +1,16 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.LoginRequest;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+import com.example.demo.dto.AuthRequest;
+import com.example.demo.dto.AuthResponse;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
-
-    public AuthController(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
-    }
-
     @PostMapping("/login")
-    public String login(@RequestBody LoginRequest request) {
-
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
-                )
-        );
-
-        return "Login successful";
+    public AuthResponse login(@RequestBody AuthRequest request) {
+        // Temporary response (no security yet)
+        return new AuthResponse("Login successful for user: " + request.getUsername());
     }
 }
