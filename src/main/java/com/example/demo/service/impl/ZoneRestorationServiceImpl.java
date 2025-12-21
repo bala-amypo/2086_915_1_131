@@ -35,15 +35,12 @@ public class ZoneRestorationServiceImpl implements ZoneRestorationService {
     @Override
     public ZoneRestorationRecord restoreZone(ZoneRestorationRecord record) {
 
-        // Fetch event
         LoadSheddingEvent event = eventRepository.findById(record.getEventId())
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
 
-        // Fetch zone
         Zone zone = zoneRepository.findById(record.getZone().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
 
-        // ✅ FIX: use eventStart (NOT eventTime)
         Instant eventInstant = event.getEventStart()
                 .atZone(ZoneId.systemDefault())
                 .toInstant();
@@ -55,3 +52,15 @@ public class ZoneRestorationServiceImpl implements ZoneRestorationService {
         record.setZone(zone);
         return restorationRepository.save(record);
     }
+
+    @Override
+    public ZoneRestorationRecord getRecordById(Long id) {
+        return restorationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Record not found"));
+    }
+
+    @Override
+    public List<ZoneRestorationRecord> getRecordsForZone(Long zoneId) {
+        return restorationRepository.findByZoneIdOrderByRestoredAtDesc(zoneId);
+    }
+}
