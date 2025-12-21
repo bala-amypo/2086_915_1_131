@@ -4,53 +4,61 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "load_shedding_events")
 public class LoadSheddingEvent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long zoneId;
+
+    private String description;
+
+    @Column(nullable = false)
     private LocalDateTime eventStart;
 
-    @ManyToOne
-    @JoinColumn(name = "zone_id")
-    private Zone zone;
-
-    // ✅ REQUIRED by JPA
     public LoadSheddingEvent() {
+        this.eventStart = LocalDateTime.now();
     }
 
-    // ✅ Convenience constructor
-    public LoadSheddingEvent(LocalDateTime eventStart, Zone zone) {
-        this.eventStart = eventStart;
-        this.zone = zone;
+    public LoadSheddingEvent(Long zoneId, String description) {
+        this.zoneId = zoneId;
+        this.description = description;
+        this.eventStart = LocalDateTime.now();
     }
 
-    // ===== Getters =====
+    // ===== GETTERS & SETTERS =====
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getZoneId() {
+        return zoneId;
+    }
+
+    public void setZoneId(Long zoneId) {
+        this.zoneId = zoneId;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public LocalDateTime getEventStart() {
         return eventStart;
     }
 
-    public Zone getZone() {
-        return zone;
-    }
-
-    // ===== Setters =====
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public void setEventStart(LocalDateTime eventStart) {
         this.eventStart = eventStart;
-    }
-
-    public void setZone(Zone zone) {
-        this.zone = zone;
     }
 }
