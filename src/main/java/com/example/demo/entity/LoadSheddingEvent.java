@@ -1,64 +1,28 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import lombok.*;
+
+import java.time.Instant;
 
 @Entity
-@Table(name = "load_shedding_events")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class LoadSheddingEvent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long zoneId;
+    @ManyToOne
+    private Zone zone;
 
-    private String description;
+    private Instant eventStart;
 
-    @Column(nullable = false)
-    private LocalDateTime eventStart;
+    private Double expectedDemandReductionMW;
 
-    public LoadSheddingEvent() {
-        this.eventStart = LocalDateTime.now();
-    }
-
-    public LoadSheddingEvent(Long zoneId, String description) {
-        this.zoneId = zoneId;
-        this.description = description;
-        this.eventStart = LocalDateTime.now();
-    }
-
-    // ===== GETTERS & SETTERS =====
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getZoneId() {
-        return zoneId;
-    }
-
-    public void setZoneId(Long zoneId) {
-        this.zoneId = zoneId;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public LocalDateTime getEventStart() {
-        return eventStart;
-    }
-
-    public void setEventStart(LocalDateTime eventStart) {
-        this.eventStart = eventStart;
-    }
+    private String reason;
 }

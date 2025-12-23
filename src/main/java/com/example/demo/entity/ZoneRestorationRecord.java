@@ -1,47 +1,28 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.Instant;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ZoneRestorationRecord {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne
     private Zone zone;
-
-    private Instant restoredAt;
 
     private Long eventId;
 
+    private Instant restoredAt;
+
     private String notes;
-
-    public ZoneRestorationRecord() {}
-
-    public ZoneRestorationRecord(Long id, Zone zone, Instant restoredAt,
-                                 Long eventId, String notes) {
-        this.id = id;
-        this.zone = zone;
-        this.restoredAt = restoredAt;
-        this.eventId = eventId;
-        this.notes = notes;
-    }
-
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-
-    public Zone getZone() { return zone; }
-    public void setZone(Zone zone) { this.zone = zone; }
-
-    public Instant getRestoredAt() { return restoredAt; }
-    public void setRestoredAt(Instant restoredAt) { this.restoredAt = restoredAt; }
-
-    public Long getEventId() { return eventId; }
-    public void setEventId(Long eventId) { this.eventId = eventId; }
-
-    public String getNotes() { return notes; }
-    public void setNotes(String notes) { this.notes = notes; }
 }

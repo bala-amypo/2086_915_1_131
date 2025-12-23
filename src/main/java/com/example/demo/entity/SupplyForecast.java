@@ -1,52 +1,28 @@
 package com.example.demo.entity;
 
 import jakarta.persistence.*;
+import lombok.*;
+
 import java.time.Instant;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class SupplyForecast {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long zoneId;
+    private Double availableSupplyMW;
 
-    private Instant forecastTime;
+    private Instant forecastStart;
 
-    private double supplyValue;
+    private Instant forecastEnd;
 
-    // getters and setters
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getZoneId() {
-        return zoneId;
-    }
-
-    public void setZoneId(Long zoneId) {
-        this.zoneId = zoneId;
-    }
-
-    public Instant getForecastTime() {
-        return forecastTime;
-    }
-
-    public void setForecastTime(Instant forecastTime) {
-        this.forecastTime = forecastTime;
-    }
-
-    public double getSupplyValue() {
-        return supplyValue;
-    }
-
-    public void setSupplyValue(double supplyValue) {
-        this.supplyValue = supplyValue;
-    }
+    @Builder.Default
+    private Instant generatedAt = Instant.now();
 }
