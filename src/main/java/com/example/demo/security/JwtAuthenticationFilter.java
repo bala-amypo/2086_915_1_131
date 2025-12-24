@@ -5,13 +5,16 @@ import com.example.demo.repository.AppUserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Optional;
 
+@Component   // ✅ VERY IMPORTANT
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -35,18 +38,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = header.substring(7);
 
             if (jwtTokenProvider.validateToken(token)) {
-                String email = jwtTokenProvider.getClaims(token).getSubject();
+                String email = jwtTokenProvider.getUsername(token);
 
                 Optional<AppUser> userOpt = appUserRepository.findByEmail(email);
 
-                if (userOpt.isPresent()) {   // ✅ NOW VALID
+                if (userOpt.isPresent()) {     // ✅ NOW VALID
                     AppUser user = userOpt.get();
 
-                    UsernamePasswordAuthenticationToken auth =
+                    UsernamePasswordAuthenticationToken authentication =
                             new UsernamePasswordAuthenticationToken(
-                                    user.getEmail(), null, null);
+                                    user.getEmail(),
+                                    null,
+                                    null
+                            );
 
-                    SecurityContextHolder.getContext().setAuthentication(auth);
+                    authentication.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
+
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
         }
