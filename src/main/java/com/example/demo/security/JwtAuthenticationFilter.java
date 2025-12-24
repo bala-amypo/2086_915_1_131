@@ -2,17 +2,16 @@ package com.example.demo.security;
 
 import com.example.demo.entity.AppUser;
 import com.example.demo.repository.AppUserRepository;
-import jakarta.servlet.*;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Optional;
 
-@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -38,18 +37,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtTokenProvider.validateToken(token)) {
                 String email = jwtTokenProvider.getClaims(token).getSubject();
 
-                Optional<AppUser> userOpt =
-                        appUserRepository.findByEmail(email);
+                Optional<AppUser> userOpt = appUserRepository.findByEmail(email);
 
-                if (userOpt.isPresent()) {
+                if (userOpt.isPresent()) {   // ✅ NOW VALID
                     AppUser user = userOpt.get();
 
                     UsernamePasswordAuthenticationToken auth =
                             new UsernamePasswordAuthenticationToken(
                                     user.getEmail(), null, null);
 
-                    SecurityContextHolder.getContext()
-                            .setAuthentication(auth);
+                    SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             }
         }
