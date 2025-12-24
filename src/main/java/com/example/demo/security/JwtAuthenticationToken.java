@@ -1,40 +1,48 @@
 package com.example.demo.security;
 
-import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.stereotype.Component;
 
-import java.util.Collection;
+import java.security.Key;
+import java.util.Date;
 
-public class JwtAuthenticationToken extends AbstractAuthenticationToken {
+@Component
+public class JwtTokenProvider {
 
-    private final Object principal;
-    private String token;
+    private static final String SECRET = "MyJwtSecretKeyMyJwtSecretKeyMyJwtSecretKey";
+    private static final long EXPIRATION_TIME = 3600000; // 1 hour
 
-    public JwtAuthenticationToken(String token) {
-        super(null);
-        this.principal = null;
-        this.token = token;
-        setAuthenticated(false);
+    private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
+
+    public String generateToken(String email) {
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + EXPIRATION_TIME);
+
+        return Jwts.builder()
+                .setSubject(email)
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
     }
 
-    public JwtAuthenticationToken(Object principal, Collection<? extends GrantedAuthority> authorities, String token) {
-        super(authorities);
-        this.principal = principal;
-        this.token = token;
-        setAuthenticated(true);
+    // ✅ THIS METHOD WAS MISSING — NOW FIXED
+    public String getUsernameFromToken(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject();
     }
 
-    @Override
-    public Object getCredentials() {
-        return token;
-    }
-
-    @Override
-    public Object getPrincipal() {
-        return principal;
-    }
-
-    public String getToken() {
-        return token;
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 }
