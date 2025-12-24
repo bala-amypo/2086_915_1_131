@@ -2,7 +2,10 @@ package com.example.demo.security;
 
 import com.example.demo.entity.AppUser;
 import com.example.demo.repository.AppUserRepository;
-import org.springframework.security.core.userdetails.*;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,17 +18,16 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String email)
-            throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
         AppUser user = appUserRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new UsernameNotFoundException("User not found: " + email));
+                        new UsernameNotFoundException("User not found with email: " + email));
 
         return User.builder()
                 .username(user.getEmail())
-                .password(user.getPassword()) // ✅ NOW WORKS
-                .roles(user.getRole())
+                .password(user.getPassword())   // ✅ FIXED
+                .roles(user.getRole())          // e.g. USER / ADMIN
                 .build();
     }
 }

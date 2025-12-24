@@ -4,17 +4,20 @@ import com.example.demo.entity.AppUser;
 import com.example.demo.repository.AppUserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Optional;
 
-@Component   // ✅ VERY IMPORTANT
+@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -32,35 +35,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        String header = request.getHeader("Authorization");
+        String token = extractToken(request);
 
-        if (header != null && header.startsWith("Bearer ")) {
-            String token = header.substring(7);
+        if (token != null && jwtTokenProvider.validateToken(token)) {
 
-            if (jwtTokenProvider.validateToken(token)) {
-                String email = jwtTokenProvider.getUsername(token);
+            String email = jwtTokenProvider.getUsernameFromToken(token);
 
-                Optional<AppUser> userOpt = appUserRepository.findByEmail(email);
+            Optional<AppUser> userOpt = appUserRepository.findByEmail(email);
 
-                if (userOpt.isPresent()) {     // ✅ NOW VALID
-                    AppUser user = userOpt.get();
+            if (userOpt.isPresent()) {
+                AppUser user = userOpt.get();
 
-                    UsernamePasswordAuthenticationToken authentication =
-                            new UsernamePasswordAuthenticationToken(
-                                    user.getEmail(),
-                                    null,
-                                    null
-                            );
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                user.getEmail(),
+                                null,
+                                Collections.emptyList()
+                        );
 
-                    authentication.setDetails(
-                            new WebAuthenticationDetailsSource().buildDetails(request)
-                    );
+                authentication.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request)
+                );
 
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private String extractToken(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
     }
 }
