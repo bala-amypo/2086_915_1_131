@@ -1,48 +1,32 @@
 package com.example.demo.security;
 
-import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
-import org.springframework.stereotype.Component;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 
-import java.security.Key;
-import java.util.Date;
+import java.util.Collection;
 
-@Component
-public class JwtTokenProvider {
+/**
+ * Required by question.
+ * Acts ONLY as Authentication token holder.
+ */
+public class JwtAuthenticationToken extends AbstractAuthenticationToken {
 
-    private static final String SECRET = "MyJwtSecretKeyMyJwtSecretKeyMyJwtSecretKey";
-    private static final long EXPIRATION_TIME = 3600000; // 1 hour
+    private final Object principal;
 
-    private final Key key = Keys.hmacShaKeyFor(SECRET.getBytes());
-
-    public String generateToken(String email) {
-        Date now = new Date();
-        Date expiry = new Date(now.getTime() + EXPIRATION_TIME);
-
-        return Jwts.builder()
-                .setSubject(email)
-                .setIssuedAt(now)
-                .setExpiration(expiry)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
+    public JwtAuthenticationToken(Object principal,
+                                  Collection<? extends GrantedAuthority> authorities) {
+        super(authorities);
+        this.principal = principal;
+        setAuthenticated(true);
     }
 
-    // ✅ THIS METHOD WAS MISSING — NOW FIXED
-    public String getUsernameFromToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key)
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
+    @Override
+    public Object getCredentials() {
+        return null;
     }
 
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
-        }
+    @Override
+    public Object getPrincipal() {
+        return principal;
     }
 }
