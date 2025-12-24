@@ -3,5 +3,6 @@ package com.example.demo.service;
 import com.example.demo.entity.AppUser;
 
 public interface AppUserService {
-    AppUser register(AppUser user);
+    AppUser getUserByEmail(String email);
+    AppUser createUser(AppUser user);
 }
