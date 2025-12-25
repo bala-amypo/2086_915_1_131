@@ -15,19 +15,19 @@ import java.util.List;
 @Service
 public class DemandReadingServiceImpl implements DemandReadingService {
 
-    private final DemandReadingRepository readingRepository;
-    private final ZoneRepository zoneRepository;
+    private final DemandReadingRepository readingRepo;
+    private final ZoneRepository zoneRepo;
 
-    // ⚠️ Constructor order matters (tests use new DemandReadingServiceImpl(...))
-    public DemandReadingServiceImpl(DemandReadingRepository readingRepository,
-                                    ZoneRepository zoneRepository) {
-        this.readingRepository = readingRepository;
-        this.zoneRepository = zoneRepository;
+    public DemandReadingServiceImpl(DemandReadingRepository readingRepo,
+                                    ZoneRepository zoneRepo) {
+        this.readingRepo = readingRepo;
+        this.zoneRepo = zoneRepo;
     }
 
     @Override
     public DemandReading createReading(DemandReading reading) {
-        Zone zone = zoneRepository.findById(reading.getZone().getId())
+
+        Zone zone = zoneRepo.findById(reading.getZone().getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
 
         if (reading.getDemandMW() < 0) {
@@ -39,28 +39,26 @@ public class DemandReadingServiceImpl implements DemandReadingService {
         }
 
         reading.setZone(zone);
-        return readingRepository.save(reading);
+        return readingRepo.save(reading);
     }
 
     @Override
     public List<DemandReading> getReadingsForZone(Long zoneId) {
-        if (!zoneRepository.existsById(zoneId)) {
-            throw new ResourceNotFoundException("Zone not found");
-        }
-        return readingRepository.findByZoneIdOrderByRecordedAtDesc(zoneId);
+        zoneRepo.findById(zoneId)
+                .orElseThrow(() -> new ResourceNotFoundException("Zone not found"));
+        return readingRepo.findByZoneIdOrderByRecordedAtDesc(zoneId);
     }
 
     @Override
     public DemandReading getLatestReading(Long zoneId) {
-        return readingRepository.findFirstByZoneIdOrderByRecordedAtDesc(zoneId)
+        return readingRepo.findFirstByZoneIdOrderByRecordedAtDesc(zoneId)
                 .orElseThrow(() -> new ResourceNotFoundException("No readings"));
     }
 
     @Override
     public List<DemandReading> getRecentReadings(Long zoneId, int limit) {
-        List<DemandReading> readings =
-                readingRepository.findByZoneIdOrderByRecordedAtDesc(zoneId);
-
-        return readings.size() > limit ? readings.subList(0, limit) : readings;
+        List<DemandReading> list =
+                readingRepo.findByZoneIdOrderByRecordedAtDesc(zoneId);
+        return list.size() > limit ? list.subList(0, limit) : list;
     }
 }
