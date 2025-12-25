@@ -1,18 +1,18 @@
 package com.example.demo.service;
 
-import com.example.demo.dto.ZoneDTO;
+import com.example.demo.entity.Zone;
 
 import java.util.List;
 
 public interface ZoneService {
 
-    ZoneDTO createZone(ZoneDTO zoneDTO);
+    Zone createZone(Zone zone);
 
-    ZoneDTO getZoneById(Long id);
+    Zone updateZone(Long id, Zone zone);
 
-    List<ZoneDTO> getAllZones();
+    Zone getZoneById(Long id);
 
-    ZoneDTO updateZone(Long id, ZoneDTO zoneDTO);
+    List<Zone> getAllZones();
 
-    void deleteZone(Long id);
+    void deactivateZone(Long id);   // ✅ REQUIRED
 }
