@@ -1,14 +1,14 @@
 package com.example.demo.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.time.Instant;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class ZoneDTO {
 
     private Long id;
@@ -16,4 +16,6 @@ public class ZoneDTO {
     private Integer priorityLevel;
     private Integer population;
     private Boolean active;
+    private Instant createdAt;
+    private Instant updatedAt;
 }
