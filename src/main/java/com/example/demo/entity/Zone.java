@@ -6,8 +6,7 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Getter
-@Setter
+@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,14 +17,10 @@ public class Zone {
     private Long id;
 
     private String zoneName;
-
     private Integer priorityLevel;
-
-    private Integer population;
-
+    private Long population;
     private Boolean active;
 
     private Instant createdAt;
-
     private Instant updatedAt;
 }

@@ -6,7 +6,11 @@ import java.util.List;
 
 public interface SupplyForecastService {
 
-    SupplyForecast save(SupplyForecast supplyForecast);
+    SupplyForecast createForecast(SupplyForecast forecast);
 
-    List<SupplyForecast> getAll();
+    SupplyForecast updateForecast(Long id, SupplyForecast forecast);
+
+    SupplyForecast getLatestForecast();
+
+    List<SupplyForecast> getAllForecasts();
 }

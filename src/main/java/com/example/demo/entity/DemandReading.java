@@ -6,9 +6,7 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "demand_readings")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -18,12 +16,9 @@ public class DemandReading {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
+    @ManyToOne
     private Zone zone;
 
-    @Column(nullable = false)
     private Double demandMW;
-
-    @Column(nullable = false)
     private Instant recordedAt;
 }

@@ -6,9 +6,7 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "zone_restoration_records")
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -16,16 +14,10 @@ public class ZoneRestorationRecord {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @ManyToOne(optional = false)
-    private Zone zone;
-
-    @Column(nullable = false)
     private Long eventId;
 
-    @Column(nullable = false)
-    private Instant restoredAt;
+    @ManyToOne
+    private Zone zone;
 
-    private String notes;
+    private Instant restoredAt;
 }
