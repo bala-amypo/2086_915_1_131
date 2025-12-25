@@ -1,23 +1,28 @@
 package com.example.demo.service.impl;
 
-import com.example.demo.entity.DemandReading;
-import com.example.demo.repository.DemandReadingRepository;
 import com.example.demo.service.LoadSheddingService;
+import com.example.demo.entity.LoadSheddingEvent;
+import com.example.demo.repository.LoadSheddingRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class LoadSheddingServiceImpl implements LoadSheddingService {
 
-    private final DemandReadingRepository readingRepo;
+    private final LoadSheddingRepository loadSheddingRepository;
 
-    public LoadSheddingServiceImpl(DemandReadingRepository readingRepo) {
-        this.readingRepo = readingRepo;
+    public LoadSheddingServiceImpl(LoadSheddingRepository loadSheddingRepository) {
+        this.loadSheddingRepository = loadSheddingRepository;
     }
 
     @Override
-    public DemandReading getLatestReading(Long zoneId) {
-        return readingRepo
-                .findFirstByZoneIdOrderByRecordedAtDesc(zoneId)
-                .orElse(null);
+    public LoadSheddingEvent createEvent(LoadSheddingEvent event) {
+        return loadSheddingRepository.save(event);
+    }
+
+    @Override
+    public List<LoadSheddingEvent> getEventsForZone(Long zoneId) {
+        return loadSheddingRepository.findByZoneId(zoneId);
     }
 }

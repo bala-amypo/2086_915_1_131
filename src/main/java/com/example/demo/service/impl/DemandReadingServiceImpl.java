@@ -24,17 +24,11 @@ public class DemandReadingServiceImpl implements DemandReadingService {
     @Override
     public DemandReading getLatestReading(Long zoneId) {
         return demandReadingRepository
-                .findTopByZoneIdOrderByRecordedAtDesc(zoneId)
-                .orElse(null);
+                .findTopByZone_IdOrderByRecordedAtDesc(zoneId);
     }
 
     @Override
     public List<DemandReading> getReadingsForZone(Long zoneId) {
-        return demandReadingRepository.findByZoneId(zoneId);
-    }
-
-    @Override
-    public List<DemandReading> getRecentReadings(Long zoneId, int limit) {
-        return demandReadingRepository.findRecentByZoneId(zoneId, limit);
+        return demandReadingRepository.findByZone_Id(zoneId);
     }
 }
