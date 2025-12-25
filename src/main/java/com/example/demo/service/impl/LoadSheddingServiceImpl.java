@@ -1,38 +1,37 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.entity.LoadSheddingEvent;
-import com.example.demo.repository.LoadSheddingEventRepository;
+import com.example.demo.repository.LoadSheddingRepository;
 import com.example.demo.service.LoadSheddingService;
 import org.springframework.stereotype.Service;
-
-import java.time.Instant;
 import java.util.List;
 
 @Service
 public class LoadSheddingServiceImpl implements LoadSheddingService {
 
-    private final LoadSheddingEventRepository repository;
+    private final LoadSheddingRepository loadSheddingRepository;
 
-    public LoadSheddingServiceImpl(LoadSheddingEventRepository repository) {
-        this.repository = repository;
+    public LoadSheddingServiceImpl(LoadSheddingRepository loadSheddingRepository) {
+        this.loadSheddingRepository = loadSheddingRepository;
     }
 
     @Override
-    public LoadSheddingEvent triggerLoadShedding(Long zoneId) {
-        LoadSheddingEvent event = new LoadSheddingEvent();
-        event.setZoneId(zoneId);
-        event.setStatus("SHEDDING");
-        event.setCreatedAt(Instant.now());
-        return repository.save(event);
+    public void triggerLoadShedding(Long zoneId) {
+        // implementation
     }
 
     @Override
     public List<LoadSheddingEvent> getAllEvents() {
-        return repository.findAll();
+        return loadSheddingRepository.findAll();
     }
 
     @Override
-    public LoadSheddingEvent getEventById(Long id) {
-        return repository.findById(id).orElse(null);
+    public LoadSheddingEvent getEventById(Long eventId) {
+        return loadSheddingRepository.findById(eventId).orElse(null);
+    }
+
+    @Override
+    public List<LoadSheddingEvent> getEventsForZone(Long zoneId) {
+        return loadSheddingRepository.findByZoneId(zoneId);
     }
 }

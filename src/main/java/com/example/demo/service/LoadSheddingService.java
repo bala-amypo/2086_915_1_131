@@ -5,9 +5,11 @@ import java.util.List;
 
 public interface LoadSheddingService {
 
-    LoadSheddingEvent triggerLoadShedding(Long zoneId);
+    void triggerLoadShedding(Long zoneId);
 
     List<LoadSheddingEvent> getAllEvents();
 
-    LoadSheddingEvent getEventById(Long id);
+    LoadSheddingEvent getEventById(Long eventId);
+
+    List<LoadSheddingEvent> getEventsForZone(Long zoneId);
 }
