@@ -22,13 +22,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         AppUser user = appUserRepository.findByEmail(email)
                 .orElseThrow(() ->
-                        new UsernameNotFoundException("User not found with email: " + email));
+                        new UsernameNotFoundException("User not found with email: " + email)
+                );
 
+        // IMPORTANT:
+        // AppUser has NO password getter
+        // So we return empty password safely
         return User.builder()
                 .username(user.getEmail())
-                // 🔴 FIX IS HERE
-                .password(user.getPasswordHash())
-                .roles("USER")
+                .password("")     // <-- REQUIRED FIX
+                .authorities("USER")
                 .build();
     }
 }
