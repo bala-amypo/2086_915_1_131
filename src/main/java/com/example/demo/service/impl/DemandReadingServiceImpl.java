@@ -6,7 +6,6 @@ import com.example.demo.service.DemandReadingService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class DemandReadingServiceImpl implements DemandReadingService {
@@ -18,22 +17,24 @@ public class DemandReadingServiceImpl implements DemandReadingService {
     }
 
     @Override
-    public DemandReading saveDemandReading(DemandReading demandReading) {
-        return demandReadingRepository.save(demandReading);
+    public DemandReading createReading(DemandReading reading) {
+        return demandReadingRepository.save(reading);
     }
 
     @Override
-    public List<DemandReading> getAllDemandReadings() {
-        return demandReadingRepository.findAll();
+    public DemandReading getLatestReading(Long zoneId) {
+        return demandReadingRepository
+                .findTopByZoneIdOrderByRecordedAtDesc(zoneId)
+                .orElse(null);
     }
 
     @Override
-    public Optional<DemandReading> getDemandReadingById(Long id) {
-        return demandReadingRepository.findById(id);
+    public List<DemandReading> getReadingsForZone(Long zoneId) {
+        return demandReadingRepository.findByZoneId(zoneId);
     }
 
     @Override
-    public void deleteDemandReading(Long id) {
-        demandReadingRepository.deleteById(id);
+    public List<DemandReading> getRecentReadings(Long zoneId, int limit) {
+        return demandReadingRepository.findRecentByZoneId(zoneId, limit);
     }
 }
