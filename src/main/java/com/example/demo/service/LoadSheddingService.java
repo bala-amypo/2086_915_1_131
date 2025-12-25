@@ -10,6 +10,4 @@ public interface LoadSheddingService {
     List<LoadSheddingEvent> getAllEvents();
 
     LoadSheddingEvent getEventById(Long id);
-
-    List<LoadSheddingEvent> getEventsForZone(Long zoneId);
 }
