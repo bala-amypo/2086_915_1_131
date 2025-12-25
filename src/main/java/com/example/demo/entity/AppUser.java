@@ -1,41 +1,52 @@
 package com.example.demo.entity;
 
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "users")
 public class AppUser {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true, nullable = false)
     private String email;
-    private String role;
 
-    public static AppUserBuilder builder() {
-        return new AppUserBuilder();
+    @Column(nullable = false)
+    private String password;
+
+    // constructors
+    public AppUser() {
     }
 
-    public static class AppUserBuilder {
-        private AppUser user = new AppUser();
-
-        public AppUserBuilder id(Long id) {
-            user.id = id;
-            return this;
-        }
-
-        public AppUserBuilder email(String email) {
-            user.email = email;
-            return this;
-        }
-
-        public AppUserBuilder role(String role) {
-            user.role = role;
-            return this;
-        }
-
-        public AppUser build() {
-            return user;
-        }
+    public AppUser(String email, String password) {
+        this.email = email;
+        this.password = password;
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
+    // getters and setters
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }
