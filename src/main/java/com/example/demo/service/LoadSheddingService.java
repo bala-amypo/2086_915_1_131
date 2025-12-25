@@ -1,7 +1,15 @@
 package com.example.demo.service;
 
+import com.example.demo.entity.LoadSheddingEvent;
 import java.util.List;
 
 public interface LoadSheddingService {
-    List<String> getEventsForZone(Long zoneId);
+
+    LoadSheddingEvent triggerLoadShedding(Long zoneId);
+
+    List<LoadSheddingEvent> getAllEvents();
+
+    LoadSheddingEvent getEventById(Long id);
+
+    List<LoadSheddingEvent> getEventsForZone(Long zoneId);
 }

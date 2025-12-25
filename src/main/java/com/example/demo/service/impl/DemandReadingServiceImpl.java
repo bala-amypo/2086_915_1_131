@@ -5,6 +5,7 @@ import com.example.demo.repository.DemandReadingRepository;
 import com.example.demo.service.DemandReadingService;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -23,12 +24,23 @@ public class DemandReadingServiceImpl implements DemandReadingService {
 
     @Override
     public DemandReading getLatestReading(Long zoneId) {
-        return demandReadingRepository
-                .findTopByZone_IdOrderByRecordedAtDesc(zoneId);
+        return demandReadingRepository.findByZoneId(zoneId)
+                .stream()
+                .max(Comparator.comparing(DemandReading::getRecordedAt))
+                .orElse(null);
     }
 
     @Override
     public List<DemandReading> getReadingsForZone(Long zoneId) {
-        return demandReadingRepository.findByZone_Id(zoneId);
+        return demandReadingRepository.findByZoneId(zoneId);
+    }
+
+    @Override
+    public List<DemandReading> getRecentReadings(Long zoneId, int limit) {
+        return demandReadingRepository.findByZoneId(zoneId)
+                .stream()
+                .sorted(Comparator.comparing(DemandReading::getRecordedAt).reversed())
+                .limit(limit)
+                .toList();
     }
 }
