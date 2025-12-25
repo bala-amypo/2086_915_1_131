@@ -1,26 +1,14 @@
-package com.example.demo.service.impl;
-
-import com.example.demo.dto.AuthResponse;
-import com.example.demo.entity.AppUser;
-import com.example.demo.exception.BadRequestException;
-import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.repository.AppUserRepository;
-import com.example.demo.security.JwtTokenProvider;
-import com.example.demo.service.AppUserService;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-
 @Service
 public class AppUserServiceImpl implements AppUserService {
 
-    private final AppUserRepository userRepository;
+    private final AppUserRepository userRepo;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public AppUserServiceImpl(AppUserRepository userRepository,
+    public AppUserServiceImpl(AppUserRepository userRepo,
                               PasswordEncoder passwordEncoder,
                               JwtTokenProvider jwtTokenProvider) {
-        this.userRepository = userRepository;
+        this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
     }
@@ -28,8 +16,8 @@ public class AppUserServiceImpl implements AppUserService {
     @Override
     public AppUser register(String email, String password, String role) {
 
-        if (userRepository.findByEmail(email).isPresent()) {
-            throw new BadRequestException("Email must be unique");
+        if (userRepo.findByEmail(email).isPresent()) {
+            throw new BadRequestException("unique");
         }
 
         AppUser user = AppUser.builder()
@@ -39,13 +27,13 @@ public class AppUserServiceImpl implements AppUserService {
                 .active(true)
                 .build();
 
-        return userRepository.save(user);
+        return userRepo.save(user);
     }
 
     @Override
     public AuthResponse login(String email, String password) {
 
-        AppUser user = userRepository.findByEmail(email)
+        AppUser user = userRepo.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {

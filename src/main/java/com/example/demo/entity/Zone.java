@@ -6,46 +6,26 @@ import lombok.*;
 import java.time.Instant;
 
 @Entity
-@Table(name = "zones", uniqueConstraints = {
-        @UniqueConstraint(columnNames = "zoneName")
-})
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Zone {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private String zoneName;
 
-    @Column(nullable = false)
     private Integer priorityLevel;
 
     private Integer population;
 
-    @Builder.Default
-    private Boolean active = true;
+    private Boolean active;
 
     private Instant createdAt;
 
     private Instant updatedAt;
-
-    @PrePersist
-    public void onCreate() {
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
-        if (active == null) {
-            active = true;
-        }
-    }
-
-    @PreUpdate
-    public void onUpdate() {
-        this.updatedAt = Instant.now();
-    }
 }
