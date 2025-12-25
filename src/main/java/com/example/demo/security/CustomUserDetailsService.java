@@ -1,29 +1,31 @@
-package com.example.demo.config;
+package com.example.demo.security;
 
-import com.example.demo.security.CustomUserDetailsService;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.example.demo.entity.AppUser;
+import com.example.demo.repository.AppUserRepository;
+import org.springframework.security.core.userdetails.*;
+import org.springframework.stereotype.Service;
 
-@Configuration
-public class SecurityConfig {
+@Service
+public class CustomUserDetailsService implements UserDetailsService {
 
-    private final CustomUserDetailsService userDetailsService;
+    private final AppUserRepository appUserRepository;
 
-    public SecurityConfig(CustomUserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
+    public CustomUserDetailsService(AppUserRepository appUserRepository) {
+        this.appUserRepository = appUserRepository;
     }
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-        return authConfig.getAuthenticationManager();
-    }
+    @Override
+    public UserDetails loadUserByUsername(String email)
+            throws UsernameNotFoundException {
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        AppUser user = appUserRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found"));
+
+        return User.builder()
+                .username(user.getEmail())
+                .password(user.getPassword())
+                .roles("USER")
+                .build();
     }
 }
