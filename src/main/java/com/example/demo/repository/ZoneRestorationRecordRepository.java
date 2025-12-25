@@ -5,5 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ZoneRestorationRepository extends JpaRepository<ZoneRestorationRecord, Long> {
+public interface ZoneRestorationRecordRepository
+        extends JpaRepository<ZoneRestorationRecord, Long> {
 }
