@@ -15,11 +15,11 @@ public class SwaggerConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Demo API")
+                        .title("Smart Grid Load Shedding Controller API")
                         .version("1.0")
-                        .description("API documentation"))
+                        .description("API for managing smart grid load shedding operations"))
                 .servers(List.of(
-                        new Server().url("https://9100.408procr.amypo.ai/")
+                        new Server().url("https://9317.pro604cr.amypo.ai/")
                 ));
     }
 }
