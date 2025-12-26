@@ -1,76 +1,49 @@
 package com.example.demo.controller;
 
-import com.example.demo.dto.ZoneDTO;
 import com.example.demo.entity.Zone;
 import com.example.demo.service.ZoneService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/zones")
 public class ZoneController {
-
+    
     private final ZoneService zoneService;
-
+    
     public ZoneController(ZoneService zoneService) {
         this.zoneService = zoneService;
     }
 
     @PostMapping
-    public ZoneDTO createZone(@RequestBody ZoneDTO dto) {
-        Zone created = zoneService.createZone(toEntity(dto));
-        return toDTO(created);
+    public ResponseEntity<Zone> createZone(@RequestBody Zone zone) {
+        Zone createdZone = zoneService.createZone(zone);
+        return ResponseEntity.ok(createdZone);
     }
 
     @PutMapping("/{id}")
-    public ZoneDTO updateZone(@PathVariable Long id, @RequestBody ZoneDTO dto) {
-        Zone updated = zoneService.updateZone(id, toEntity(dto));
-        return toDTO(updated);
+    public ResponseEntity<Zone> updateZone(@PathVariable Long id, @RequestBody Zone zone) {
+        Zone updatedZone = zoneService.updateZone(id, zone);
+        return ResponseEntity.ok(updatedZone);
     }
 
     @GetMapping("/{id}")
-    public ZoneDTO getZone(@PathVariable Long id) {
-        return toDTO(zoneService.getZoneById(id));
+    public ResponseEntity<Zone> getZone(@PathVariable Long id) {
+        Zone zone = zoneService.getZoneById(id);
+        return ResponseEntity.ok(zone);
     }
 
     @GetMapping
-    public List<ZoneDTO> getAllZones() {
-        return zoneService.getAllZones()
-                .stream()
-                .map(this::toDTO)
-                .collect(Collectors.toList());
+    public ResponseEntity<List<Zone>> getAllZones() {
+        List<Zone> zones = zoneService.getAllZones();
+        return ResponseEntity.ok(zones);
     }
 
     @PutMapping("/{id}/deactivate")
-    public void deactivateZone(@PathVariable Long id) {
+    public ResponseEntity<Void> deactivateZone(@PathVariable Long id) {
         zoneService.deactivateZone(id);
-    }
-
-    // -------------------------
-    // DTO ↔ Entity MAPPERS
-    // -------------------------
-
-    private Zone toEntity(ZoneDTO dto) {
-        return Zone.builder()
-                .id(dto.getId())
-                .zoneName(dto.getZoneName())
-                .priorityLevel(dto.getPriorityLevel())
-                .population(dto.getPopulation())
-                .active(dto.getActive())
-                .build();
-    }
-
-    private ZoneDTO toDTO(Zone zone) {
-        ZoneDTO dto = new ZoneDTO();
-        dto.setId(zone.getId());
-        dto.setZoneName(zone.getZoneName());
-        dto.setPriorityLevel(zone.getPriorityLevel());
-        dto.setPopulation(zone.getPopulation());
-        dto.setActive(zone.getActive());
-        dto.setCreatedAt(zone.getCreatedAt());
-        dto.setUpdatedAt(zone.getUpdatedAt());
-        return dto;
+        return ResponseEntity.ok().build();
     }
 }

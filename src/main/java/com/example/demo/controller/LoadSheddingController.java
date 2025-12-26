@@ -2,38 +2,42 @@ package com.example.demo.controller;
 
 import com.example.demo.entity.LoadSheddingEvent;
 import com.example.demo.service.LoadSheddingService;
-
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/shedding")
+@RequestMapping("/api/load-shedding")
 public class LoadSheddingController {
-
-    private final LoadSheddingService service;
-
-    public LoadSheddingController(LoadSheddingService service) {
-        this.service = service;
+    
+    private final LoadSheddingService loadSheddingService;
+    
+    public LoadSheddingController(LoadSheddingService loadSheddingService) {
+        this.loadSheddingService = loadSheddingService;
     }
 
     @PostMapping("/trigger/{forecastId}")
-    public LoadSheddingEvent trigger(@PathVariable Long forecastId) {
-        return service.triggerLoadShedding(forecastId);
-    }
-
-    @GetMapping
-    public List<LoadSheddingEvent> getAll() {
-        return service.getAllEvents();
+    public ResponseEntity<LoadSheddingEvent> triggerLoadShedding(@PathVariable Long forecastId) {
+        LoadSheddingEvent event = loadSheddingService.triggerLoadShedding(forecastId);
+        return ResponseEntity.ok(event);
     }
 
     @GetMapping("/{id}")
-    public LoadSheddingEvent getById(@PathVariable Long id) {
-        return service.getEventById(id);
+    public ResponseEntity<LoadSheddingEvent> getEvent(@PathVariable Long id) {
+        LoadSheddingEvent event = loadSheddingService.getEventById(id);
+        return ResponseEntity.ok(event);
     }
 
     @GetMapping("/zone/{zoneId}")
-    public List<LoadSheddingEvent> getForZone(@PathVariable Long zoneId) {
-        return service.getEventsForZone(zoneId);
+    public ResponseEntity<List<LoadSheddingEvent>> getEventsForZone(@PathVariable Long zoneId) {
+        List<LoadSheddingEvent> events = loadSheddingService.getEventsForZone(zoneId);
+        return ResponseEntity.ok(events);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<LoadSheddingEvent>> getAllEvents() {
+        List<LoadSheddingEvent> events = loadSheddingService.getAllEvents();
+        return ResponseEntity.ok(events);
     }
 }
